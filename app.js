@@ -14,20 +14,24 @@ app.use(morgan("tiny"))
 const productSchema = mongoose.Schema({
   name: String,
   image: String,
-  countInStock: Number,
+  countInStock: {
+    type: Number,
+    required: true,
+  },
 })
 
 const Product = mongoose.model("Product", productSchema)
 
-app.get(`${api}/products`, (req, res) => {
-  const product = {
-    id: 1,
-    name: "hair dresser",
-    image: "some_url",
+//with the help for async and await method.
+app.get(`${api}/products`, async (req, res) => {
+  const productList = await Product.find()
+  if (!productList) {
+    res.status(500).json({ success: false })
   }
-  res.send(product)
+  res.send(productList)
 })
 
+//with the help of normal pormise method/function.
 app.post(`${api}/products`, (req, res) => {
   const product = new Product({
     name: req.body.name,
