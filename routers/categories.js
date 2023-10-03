@@ -3,14 +3,26 @@ const express = require("express")
 const router = express.Router()
 
 //with the help for async and await method.
+//Get whole list
 router.get(`/`, async (req, res) => {
   const categoryList = await Category.find()
   if (!categoryList) {
     res.status(500).json({ success: false })
   }
-  res.send(categoryList)
+  res.status(200).send(categoryList)
 })
 
+//Get list by ID
+router.get("/:id", async (req, res) => {
+  const category = await Category.findById(req.params.id)
+
+  if (!category) {
+    res.status(500).json({ message: "The category with give ID was not found" })
+  }
+  res.status(200).status(category)
+})
+
+//Post Categories API..
 router.post(`/`, async (req, res) => {
   let category = new Category({
     name: req.body.name,
@@ -25,6 +37,7 @@ router.post(`/`, async (req, res) => {
   res.send(category)
 })
 
+//Delete Category API by ID
 router.delete(`/:id`, (req, res) => {
   Category.findByIdAndRemove(req.params.id)
     .then(category => {
@@ -45,4 +58,5 @@ router.delete(`/:id`, (req, res) => {
     })
 })
 
+//Exporting Router module for API Request
 module.exports = router
