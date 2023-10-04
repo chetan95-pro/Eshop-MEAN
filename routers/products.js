@@ -5,7 +5,7 @@ const router = express.Router()
 
 ///Get All list of Products..
 router.get(`/`, async (req, res) => {
-  const productList = await Product.find().select("name image -_id")
+  const productList = await Product.find()
   if (!productList) {
     res.status(500).json({ success: false })
   }
@@ -14,7 +14,7 @@ router.get(`/`, async (req, res) => {
 
 //Get list of product By ID.
 router.get(`/:id`, async (req, res) => {
-  const product = await Product.findById(req.params.id)
+  const product = await Product.findById(req.params.id).populate("category")
 
   if (!product) return res.status(500).json({ success: false })
   res.send(product)
