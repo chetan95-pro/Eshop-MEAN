@@ -3,13 +3,21 @@ const { Category } = require("../models/category")
 const express = require("express")
 const router = express.Router()
 
-//with the help for async and await method.
+///Get All list of Products..
 router.get(`/`, async (req, res) => {
-  const productList = await Product.find()
+  const productList = await Product.find().select("name image -_id")
   if (!productList) {
     res.status(500).json({ success: false })
   }
   res.send(productList)
+})
+
+//Get list of product By ID.
+router.get(`/:id`, async (req, res) => {
+  const product = await Product.findById(req.params.id)
+
+  if (!product) return res.status(500).json({ success: false })
+  res.send(product)
 })
 
 //with the help of normal pormise method/function.
@@ -17,7 +25,7 @@ router.post(`/`, async (req, res) => {
   const category = await Category.findById(req.body.category)
   if (!category) return res.status(400).send("Invalid Category")
 
-  const product = new Product({
+  let product = new Product({
     name: req.body.name,
     description: req.body.description,
     richDescription: req.body.richDescription,
@@ -35,7 +43,7 @@ router.post(`/`, async (req, res) => {
 
   if (!product) return res.status(500).send("The product cannot be created")
 
-  return res.send(product)
+  res.send(product)
 })
 
 module.exports = router
