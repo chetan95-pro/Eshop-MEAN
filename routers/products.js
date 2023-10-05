@@ -6,7 +6,12 @@ const mongoose = require("mongoose")
 
 ///Get All list of Products..
 router.get(`/`, async (req, res) => {
-  const productList = await Product.find()
+  let filter = {}
+
+  if (req.query.categories) {
+    const filter = { category: req.query.categories.split(",") }
+  }
+  const productList = await Product.find(filter).populate("category")
   if (!productList) {
     res.status(500).json({ success: false })
   }
@@ -99,6 +104,31 @@ router.delete(`/:id`, (req, res) => {
     .catch(err => {
       return res.status(400).json({ success: false, error: err })
     })
+})
+
+//Counting the products in Database for Admin Panel
+// router.get(`/get/count`, async (req, res) => {
+//   try {
+//     const productCount = await Product.countDocuments(count => count)
+//     if (!productCount) {
+//       res.status(500).json({ success: false })
+//     }
+//     res.send({
+//       productCount: productCount,
+//     })
+//   } catch (err) {
+//     res.send(err)
+//   }
+// })
+
+//Feature the products in Database for Admin Panel
+router.get(`/get/featured/:count`, async (req, res) => {
+  const count = req.params.count ? req.params.count : 0
+  const product = await Product.find({ isFeatured: true }).limit(+count)
+  if (!product) {
+    res.status(500).json({ success: false })
+  }
+  res.send(product)
 })
 
 module.exports = router
